@@ -26,6 +26,7 @@ class Sky {
             x: Math.random() * this.width,
             y: Math.random() * this.height,
             radius: radius,
+            originalRadius: radius,
             color: '#fff',
             speed: Math.random(),
          })
@@ -37,7 +38,22 @@ class Sky {
    updateStars() {
       this.stars.forEach(star => {
          star.x += star.speed;
+         star.y -= star.speed * ((this.width / 2) - star.x) / 2000;
+         star.radius = star.originalRadius * (Math.random() / 3 + 0.8);
+
+         if (star.x > this.width + 2 * star.radius) {
+            star.x = -2 * star.radius;
+         }
       })
+   }
+
+   drawOverlayer() {
+      let gradient = this.ctx.createRadialGradient(this.width / 2, this.height / 2, 250, this.width / 2, this.height / 2, this.width / 2);
+      gradient.addColorStop(0, 'rgba(0, 0, 0, 0)');
+      gradient.addColorStop(1, 'rgba(0, 0, 0, 0.77)');
+
+      this.ctx.fillStyle = gradient;
+      this.ctx.fillRect(0, 0, this.width, this.height);
    }
 
    clearCanvas() {
@@ -74,15 +90,18 @@ class Sky {
 
    draw() {
       this.clearCanvas();
+
       this.drawStars();
       // this.updateStars();
+
+      this.drawOverlayer();
 
       window.requestAnimationFrame(() => this.draw());
    }
 
    run() {
       this.initCanvas();
-      this.generateStars(260);
+      this.generateStars(400);
       this.draw();
    }
 }
